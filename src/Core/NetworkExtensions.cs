@@ -12,7 +12,7 @@ namespace Network.Core
         {
             return NetworkInterface.GetAllNetworkInterfaces()
                 .SelectMany(x => x.GetIPProperties().UnicastAddresses)
-                .Where(x => string.IsNullOrWhiteSpace(x.Address.ToString()) == false)
+                .Where(x => !string.IsNullOrWhiteSpace(x.Address.ToString()))
                 .Select(x => x.Address).ToList();
         }
 
