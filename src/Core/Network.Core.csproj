@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <PackageVersion/>
+        <Title>Network Core</Title>
+        <Authors>tiagor87@gmail.com</Authors>
+        <Description>Network extensions.</Description>
+        <PackageProjectUrl>https://github.com/tiagor87/Network</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/tiagor87/Network</RepositoryUrl>
+        <PackageTags>network ip url dns</PackageTags>
+    </PropertyGroup>
+
+</Project>
