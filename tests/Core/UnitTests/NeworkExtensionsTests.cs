@@ -30,6 +30,12 @@ namespace Network.Core.UnitTests
         [InlineData("172.29.0.0")]
         [InlineData("172.30.0.0")]
         [InlineData("172.31.0.0")]
+        [InlineData("127.0.0.0")]
+        [InlineData("127.0.0.254")]
+        [InlineData("127.0.100.0")]
+        [InlineData("127.0.100.254")]
+        [InlineData("127.100.0.0")]
+        [InlineData("127.100.0.254")]
         public void GivenAddressWhenIsPrivateShouldReturnTrue(string ip)
         {
             IPAddress.Parse(ip).IsPrivate().Should().BeTrue();
@@ -76,11 +82,19 @@ namespace Network.Core.UnitTests
         [InlineData("https://localhost2")]
         [InlineData("amqp://localhost2")]
         [InlineData("mongodb://localhost2")]
-        [InlineData("http://127.0.0.2")]
-        [InlineData("https://127.0.0.2")]
-        [InlineData("amqp://127.0.0.2")]
-        [InlineData("mongodb://127.0.0.2")]
+        [InlineData("http://128.0.0.2")]
+        [InlineData("https://128.0.0.2")]
+        [InlineData("amqp://128.0.0.2")]
+        [InlineData("mongodb://128.0.0.2")]
         public void GivenUriWhenIsPublicShouldReturnFalse(string address)
+        {
+            new Uri(address).IsPrivate().Should().BeFalse();
+        }
+
+        [Theory]
+        [InlineData("http://eurealmentenaoexisto.br")]
+        [InlineData("http://ididnsexists.com")]
+        public void GivenUriWhenIsNotFoundShouldReturnFalse(string address)
         {
             new Uri(address).IsPrivate().Should().BeFalse();
         }

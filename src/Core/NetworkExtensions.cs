@@ -21,9 +21,14 @@ namespace Network.Core
             var bytes = ipAddress.GetAddressBytes();
             switch (bytes[0])
             {
-                case 10: return true;
-                case 172: return bytes[1] >= 16 && bytes[1] <= 31;
-                case 192: return bytes[1] == 168;
+                case 127:
+                    return true;
+                case 10:
+                    return true;
+                case 172:
+                    return bytes[1] >= 16 && bytes[1] <= 31;
+                case 192:
+                    return bytes[1] == 168;
                 default:
                     return false;
             }
@@ -31,8 +36,8 @@ namespace Network.Core
 
         public static bool IsPrivate(this IPAddress ipAddress)
         {
-            return ipAddress.HasPrivateNeworkSpecification()
-                   || GetPrivateNetworkIPAddresses().Contains(ipAddress);
+            return ipAddress.HasPrivateNeworkSpecification() ||
+                   GetPrivateNetworkIPAddresses().Contains(ipAddress);
         }
 
         public static bool IsPrivate(this Uri uri)
