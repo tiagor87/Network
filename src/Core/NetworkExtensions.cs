@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 
 namespace Network.Core
 {
     public static class NetworkExtensions
     {
+        private static ConcurrentDictionary<string, bool> _lastUriResults = new ConcurrentDictionary<string, bool>();
+        private static ConcurrentDictionary<IPAddress, bool> _lastIPAddressResults = new ConcurrentDictionary<IPAddress, bool>();
+        
         public static IEnumerable<IPAddress> GetPrivateNetworkIPAddresses()
         {
             return NetworkInterface.GetAllNetworkInterfaces()
@@ -36,15 +41,33 @@ namespace Network.Core
 
         public static bool IsPrivate(this IPAddress ipAddress)
         {
-            return ipAddress.HasPrivateNeworkSpecification() ||
+            if (_lastIPAddressResults.TryGetValue(ipAddress, out var result))
+            {
+                return result;
+            }
+            result = ipAddress.HasPrivateNeworkSpecification() ||
                    GetPrivateNetworkIPAddresses().Contains(ipAddress);
+            _lastIPAddressResults.AddOrUpdate(ipAddress, result, (key, value) => result);
+            return result;
         }
 
         public static bool IsPrivate(this Uri uri)
         {
+            return IsPrivateAsync(uri).GetAwaiter().GetResult();
+        }
+
+        public static async Task<bool> IsPrivateAsync(this Uri uri)
+        {
+            if (_lastUriResults.TryGetValue(uri.Host, out var isPrivate))
+            {
+                return isPrivate;
+            }
             try
             {
-                return Dns.GetHostAddresses(uri.Host).Any(ipAddress => ipAddress.IsPrivate());
+                var hosts = await Dns.GetHostAddressesAsync(uri.Host);
+                var result = hosts.Any(ipAddress => ipAddress.IsPrivate());
+                _lastUriResults.AddOrUpdate(uri.Host, result, (key, value) => result);
+                return result;
             }
             catch
             {

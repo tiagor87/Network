@@ -1,5 +1,8 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
@@ -97,6 +100,38 @@ namespace Network.Core.UnitTests
         public void GivenUriWhenIsNotFoundShouldReturnFalse(string address)
         {
             new Uri(address).IsPrivate().Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task GivenUriShouldTest1000TimesInLessThan150Ms()
+        {
+            var uri = new Uri("https://google.com");
+
+            var stopwatch = Stopwatch.StartNew();
+            for (var i = 0; i < 1000; i++)
+            {
+                await uri.IsPrivateAsync();
+            }
+            stopwatch.Stop();
+
+            stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(150));
+        }
+        
+        [Fact]
+        public void GivenIpAddressShouldTest1000TimesInLessThan150Ms()
+        {
+            var uri = new Uri("https://google.com");
+            var ipAddress = Dns.GetHostAddresses(uri.Host).First();
+
+            var stopwatch = Stopwatch.StartNew();
+            for (var i = 0; i < 1000; i++)
+            {
+                ipAddress.IsPrivate();
+            }
+            stopwatch.Stop();
+
+            stopwatch.Elapsed.Should().BeLessOrEqualTo(TimeSpan.FromMilliseconds(150));
+
         }
     }
 }
